@@ -3,7 +3,6 @@ import gameConfig as config
 
 
 class TargetObject(pygame.sprite.Sprite):
-
     def __init__(self, startPosition):
         super().__init__()
         self.image = pygame.image.load('./assets/sprites/target.png')
@@ -11,6 +10,12 @@ class TargetObject(pygame.sprite.Sprite):
         self.rect.x = startPosition[0]
         self.rect.y = startPosition[1]
         self.hp = config.DEFAULT_OBJECT_HP_COUNT
+
+    def GetHp(self):
+        return self.hp
+
+    def GetHitbox(self):
+        return self.rect
 
     def DecrementHp(self):
         if self.hp > 0:
