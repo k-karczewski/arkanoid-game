@@ -9,21 +9,58 @@ pygame.init()
 all_sprites = pygame.sprite.Group()
 deltaTime = 0.0
 ballDelta = 0.0
-screen = pygame.display.set_mode(config.DEFAULT_SCREEN_SIZE)
-p1 = Player(config.PLAYER_START_POSITION,
-            config.PLAYER_SIZE, config.DEFAULT_PLAYER_SPEED)
-ball = Ball((config.PLAYER_START_POSITION[0] + config.PLAYER_SIZE[0]/2,
-             config.PLAYER_START_POSITION[1] - config.BALL_RADIUS), config.BALL_RADIUS, config.DEFAULT_BALL_SPEED, False)
-allBalls = [ball]
-allBallsDeltas = [ballDelta]
+screen = None
+p1 = None
+ball = None
+allBalls = []
+allBallsDeltas = []
 ballSpawnedOnPoints = 0
 numberOfBalls = 1
 targets = []
-numberOfTargets = config.TARGETS_IN_ROW * config.NUMBER_OF_ROWS
-clock = pygame.time.Clock()
-font = pygame.font.SysFont(None, 25)
+numberOfTargets = 0
+clock = None
+font = None
 gameFailed = False
 gameWon = False
+
+
+def InitializeGame():
+    pygame.init()
+    global gameFailed
+    global gameWon
+    global deltaTime
+    global ballDelta
+    global screen
+    global font
+    global p1
+    global ball
+    global numberOfBalls
+    global ballSpawnedOnPoints
+    global allBalls
+    global allBallsDeltas
+    global all_sprites
+    global targets
+    global numberOfTargets
+    global clock
+
+    gameFailed = False
+    gameWon = False
+    deltaTime = 0.0
+    ballDelta = 0.0
+    screen = pygame.display.set_mode(config.DEFAULT_SCREEN_SIZE)
+    font = pygame.font.SysFont(None, 25)
+    p1 = Player(config.PLAYER_START_POSITION,
+                config.PLAYER_SIZE, config.DEFAULT_PLAYER_SPEED)
+    ball = Ball((config.PLAYER_START_POSITION[0] + config.PLAYER_SIZE[0]/2,
+                 config.PLAYER_START_POSITION[1] - config.BALL_RADIUS), config.BALL_RADIUS, config.DEFAULT_BALL_SPEED, False)
+    numberOfBalls = 1
+    ballSpawnedOnPoints = 0
+    allBalls = [ball]
+    allBallsDeltas = [ballDelta]
+    all_sprites = pygame.sprite.Group()
+    targets = []
+    numberOfTargets = config.TARGETS_IN_ROW * config.NUMBER_OF_ROWS
+    clock = pygame.time.Clock()
 
 
 def CreateTargets():
@@ -67,16 +104,15 @@ def CheckGameState(balls, deltas):
     for i in range(len(balls)):
         if balls[i].IsOnScreen() == False and balls[i].GetRunningMode() == True:
             numberOfBalls -= 1
-            print(numberOfBalls)
             balls[i].SetRunningMode(False)
             if numberOfBalls == 0:
                 ShowMessage("You lost! You have reached " +
-                            str(p1.GetScore()) + " points.", (255, 255, 255))
+                            str(p1.GetScore()) + " points. Press R to play again", (255, 255, 255))
                 gameFailed = True
 
     if numberOfTargets == 0:
         ShowMessage("You won! You have reached " +
-                    str(p1.GetScore()) + " points.", (255, 255, 255))
+                    str(p1.GetScore()) + " points. \n Press R to play again", (255, 255, 255))
         gameWon = True
 
 
@@ -89,9 +125,10 @@ def CheckScore():
 def ShowMessage(msg, color):
     failureText = font.render(msg, True, color)
     screen.blit(
-        failureText, (config.DEFAULT_SCREEN_SIZE[0]/2 - 130, config.DEFAULT_SCREEN_SIZE[1]/2))
+        failureText, (config.DEFAULT_SCREEN_SIZE[0]/2 - 230, config.DEFAULT_SCREEN_SIZE[1]/2))
 
 
+InitializeGame()
 CreateTargets()
 
 while True:
@@ -125,7 +162,10 @@ while True:
 
         if keys[pygame.K_r]:
             if gameFailed == True or gameWon == True:
-                print("tutaj bedzie restart")
+                gameFailed = False
+                gameWon = False
+                InitializeGame()
+                CreateTargets()
 
         if numberOfTargets != 0:
             for i in range(len(targets)):
