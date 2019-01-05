@@ -11,6 +11,7 @@ class Ball:
         self.ballSpeed = speed
         self.ballDirection = (bool(random.getrandbits(1)), True)
         self.isRunning = isRunning
+        self.hitSound = pygame.mixer.Sound('./assets/sounds/hit.ogg')
 
     def GetRunningMode(self):
         return self.isRunning
@@ -66,6 +67,8 @@ class Ball:
             if self.ballSpeed <= config.DEFAULT_MAX_BALL_SPEED:
                 self.ballSpeed += config.DEFAULT_BALL_ACCELERATION
 
+            self.hitSound.play()
+
         if self.box.y <= 0:
             self.ballDirection = (
                 self.ballDirection[0], not self.ballDirection[1])
@@ -73,9 +76,10 @@ class Ball:
             if self.ballSpeed <= config.DEFAULT_MAX_BALL_SPEED:
                 self.ballSpeed += config.DEFAULT_BALL_ACCELERATION
 
+            self.hitSound.play()
+
     def IsCollidedWithObject(self, object):
         if self.box.colliderect(object.GetHitbox()):
-
             # check if ball touched bottom side of target
             if (((self.box.topleft[0] >= object.GetHitbox().bottomleft[0] and self.box.topright[0] <= object.GetHitbox().bottomright[0]) and (self.box.topleft[1] <= object.GetHitbox().bottomleft[1] and self.box.topright[1] <= object.GetHitbox().bottomright[1])) and
                     (self.box.topleft[1] > object.GetHitbox().topleft[1] and self.box.topright[1] > object.GetHitbox().topright[1])):
