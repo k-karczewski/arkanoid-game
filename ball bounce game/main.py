@@ -21,6 +21,9 @@ numberOfBalls = 1
 targets = []
 numberOfTargets = config.TARGETS_IN_ROW * config.NUMBER_OF_ROWS
 clock = pygame.time.Clock()
+font = pygame.font.SysFont(None, 25)
+gameFailed = False
+gameWon = False
 
 
 def CreateTargets():
@@ -38,10 +41,14 @@ def CreateTargets():
 
 
 def RefreshScreen(screen, player):
-    screen.fill(config.COLOR_BLACK)
+    if gameFailed == False and gameWon == False:
+        screen.fill(config.COLOR_BLACK)
     player.DrawPlayer(screen, config.PLAYER_COLOR)
+
     for i in range(len(allBalls)):
         allBalls[i].DrawBall(screen, config.BALL_COLOR)
+
+    CheckScore()
     all_sprites.update()
     all_sprites.draw(screen)
     pygame.display.flip()
@@ -49,6 +56,40 @@ def RefreshScreen(screen, player):
 
 def StartGame():
     allBalls[0].SetRunningMode(True)
+
+
+def CheckGameState(balls, deltas):
+    global numberOfBalls
+    global gameFailed
+    global gameWon
+    global numberOfTargets
+
+    for i in range(len(balls)):
+        if balls[i].IsOnScreen() == False and balls[i].GetRunningMode() == True:
+            numberOfBalls -= 1
+            print(numberOfBalls)
+            balls[i].SetRunningMode(False)
+            if numberOfBalls == 0:
+                ShowMessage("You lost! You have reached " +
+                            str(p1.GetScore()) + " points.", (255, 255, 255))
+                gameFailed = True
+
+    if numberOfTargets == 0:
+        ShowMessage("You won! You have reached " +
+                    str(p1.GetScore()) + " points.", (255, 255, 255))
+        gameWon = True
+
+
+def CheckScore():
+    screenText = font.render(
+        "Points: " + str(p1.GetScore()), True, (255, 255, 255))
+    screen.blit(screenText, [20, 20])
+
+
+def ShowMessage(msg, color):
+    failureText = font.render(msg, True, color)
+    screen.blit(
+        failureText, (config.DEFAULT_SCREEN_SIZE[0]/2 - 130, config.DEFAULT_SCREEN_SIZE[1]/2))
 
 
 CreateTargets()
@@ -63,8 +104,7 @@ while True:
     for i in range(len(allBallsDeltas)):
         if allBalls[i].GetRunningMode() == True:
             allBallsDeltas[i] += deltaTime
-        #ballDelta += deltaTime
-    # print(deltaTime)
+
     while deltaTime > 1 / config.MAX_GAME_FPS:
         deltaTime -= 1 / config.MAX_GAME_FPS
 
@@ -83,6 +123,10 @@ while True:
                 ball.MoveBallRight()
             p1.MovePlayerRight()
 
+        if keys[pygame.K_r]:
+            if gameFailed == True or gameWon == True:
+                print("tutaj bedzie restart")
+
         if numberOfTargets != 0:
             for i in range(len(targets)):
                 if targets[i-1].GetHp() <= 0:
@@ -92,9 +136,7 @@ while True:
                     numberOfTargets -= 1
                     p1.AddPoints(config.POINTS_FOR_BLOCK)
 
-                    # tu juz nie wiem - do testow
                     if p1.GetScore() % config.NEW_BALL_SPAWN_ON_POINTS == 0 and ballSpawnedOnPoints != p1.GetScore():
-                        print(p1.score)
                         newBall = Ball(config.NEW_BALL_START_POINT,
                                        config.BALL_RADIUS, config.DEFAULT_BALL_SPEED, True)
                         allBalls.append(newBall)
@@ -104,16 +146,17 @@ while True:
                         allBallsDeltas.append(newBallDelta)
 
     for i in range(len(allBalls)):
-        while allBallsDeltas[i] > 1 / allBalls[i].GetSpeed():
-            for i in range(len(allBalls)):
-                if allBalls[i].GetRunningMode() == True:
-                    allBallsDeltas[i] -= 1 / allBalls[i].GetSpeed()
-                    allBalls[i].MoveBall()
-                    allBalls[i].IsCollidedWithPlayer(p1)
-                    allBalls[i].IsCollidedWithEdge()
+        if allBalls[i].GetRunningMode() == True:
+            while allBallsDeltas[i] > 1 / allBalls[i].GetSpeed():
+                allBallsDeltas[i] -= 1 / allBalls[i].GetSpeed()
+                allBalls[i].MoveBall()
+                allBalls[i].IsCollidedWithPlayer(p1)
+                allBalls[i].IsCollidedWithEdge()
 
-                    if numberOfTargets != 0:
-                        for j in range(numberOfTargets):
-                            allBalls[i].IsCollidedWithObject(targets[j])
+                if numberOfTargets != 0:
+                    for j in range(numberOfTargets):
+                        allBalls[i].IsCollidedWithObject(targets[j])
 
-    RefreshScreen(screen, p1)
+    if gameFailed == False and gameWon == False:
+        CheckGameState(allBalls, allBallsDeltas)
+        RefreshScreen(screen, p1)
