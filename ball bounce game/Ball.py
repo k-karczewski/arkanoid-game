@@ -63,9 +63,15 @@ class Ball:
             self.ballDirection = (
                 not self.ballDirection[0], self.ballDirection[1])
 
+            if self.ballSpeed <= config.DEFAULT_MAX_BALL_SPEED:
+                self.ballSpeed += config.DEFAULT_BALL_ACCELERATION
+
         if self.box.y <= 0:
             self.ballDirection = (
                 self.ballDirection[0], not self.ballDirection[1])
+
+            if self.ballSpeed <= config.DEFAULT_MAX_BALL_SPEED:
+                self.ballSpeed += config.DEFAULT_BALL_ACCELERATION
 
     def IsCollidedWithObject(self, object):
         if self.box.colliderect(object.GetHitbox()):
@@ -116,3 +122,9 @@ class Ball:
                 # collistion not classified
                 print("collision not classified")
                 pass
+
+    def IsOnScreen(self):
+        if self.box.y <= config.DEFAULT_SCREEN_SIZE[1]:
+            return True
+        else:
+            return False
