@@ -79,7 +79,6 @@ class Ball:
             # check if ball touched bottom side of target
             if (((self.box.topleft[0] >= object.GetHitbox().bottomleft[0] and self.box.topright[0] <= object.GetHitbox().bottomright[0]) and (self.box.topleft[1] <= object.GetHitbox().bottomleft[1] and self.box.topright[1] <= object.GetHitbox().bottomright[1])) and
                     (self.box.topleft[1] > object.GetHitbox().topleft[1] and self.box.topright[1] > object.GetHitbox().topright[1])):
-                print("bottom")
                 self.ballDirection = (
                     self.ballDirection[0], not self.ballDirection[1])
                 object.DecrementHp()
@@ -91,7 +90,6 @@ class Ball:
             # check if ball touched top side of target
             elif (((self.box.bottomleft[0] >= object.GetHitbox().topleft[0] and self.box.bottomright[0] <= object.GetHitbox().topright[0]) and (self.box.bottomleft[1] >= object.GetHitbox().topleft[1] and self.box.bottomright[1] >= object.GetHitbox().topright[1])) and
                     (self.box.bottomleft[1] < object.GetHitbox().bottomleft[1] and self.box.bottomright[1] < object.GetHitbox().bottomright[1])):
-                print("top")
                 self.ballDirection = (
                     self.ballDirection[0], not self.ballDirection[1])
                 self.box.y -= config.MOVEMENT_AFTER_HIT
@@ -101,7 +99,6 @@ class Ball:
 
             # check if ball touched left side of target
             elif ((self.box.topright[0] >= object.GetHitbox().topleft[0] and self.box.bottomright[0] >= object.GetHitbox().bottomleft[0]) and (self.box.bottomright[1] >= object.GetHitbox().topleft[1] and self.box.topright[1] <= object.GetHitbox().bottomleft[1]) and (self.box.bottomright[0] < object.GetHitbox().bottomright[0] and self.box.topright[0] < object.GetHitbox().topright[0])):
-                print("left")
                 self.ballDirection = (
                     not self.ballDirection[0],  self.ballDirection[1])
                 self.box.x -= config.MOVEMENT_AFTER_HIT
@@ -111,7 +108,6 @@ class Ball:
 
             # check if ball touched right side of target
             elif ((self.box.topleft[0] <= object.GetHitbox().topright[0] and self.box.bottomleft[0] <= object.GetHitbox().bottomright[0]) and (self.box.bottomleft[1] >= object.GetHitbox().topright[1] and self.box.topleft[1] <= object.GetHitbox().bottomright[1]) and (self.box.bottomleft[0] > object.GetHitbox().bottomleft[0] and self.box.topleft[0] > object.GetHitbox().topleft[0])):
-                print("right")
                 self.ballDirection = (
                     not self.ballDirection[0],  self.ballDirection[1])
                 self.box.x += config.MOVEMENT_AFTER_HIT
@@ -120,7 +116,6 @@ class Ball:
                     self.ballSpeed += config.DEFAULT_BALL_ACCELERATION
             else:
                 # collistion not classified
-                print("collision not classified")
                 pass
 
     def IsOnScreen(self):
